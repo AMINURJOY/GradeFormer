@@ -109,23 +109,24 @@ Table 1 places these studies alongside GradeFormer. The earlier pipelines summar
 
 \begin{table}[H]
 \centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.25}
 \caption{Overview of prostate histopathology grading methods, datasets, preprocessing, and evaluation settings. ``Ext. Val.'' indicates evaluation on a cohort not used for training; ``MS / Graph'' indicates multi-scale representation and spatial graph modeling.}
 \label{tab:related_methods}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{p{3.8cm} p{2.8cm} p{3.8cm} p{6.2cm} c c c}
+\begin{tabularx}{\textwidth}{p{2.2cm} p{1.6cm} p{2.3cm} X c c p{2.3cm}}
 \toprule
-\textbf{Reference} & \textbf{Dataset} & \textbf{Preprocessing} & \textbf{Method} & \textbf{Ext. Val.} & \textbf{MS / Graph} & \textbf{QWK / $\kappa$ (int. / ext.)} \\
+\textbf{Reference} & \textbf{Dataset} & \textbf{Preprocessing} & \textbf{Method} & \textbf{\shortstack{Ext.\\Val.}} & \textbf{\shortstack{MS /\\Graph}} & \textbf{\shortstack{QWK / $\kappa$\\(int. / ext.)}} \\
 \midrule
 Silva-Rodr\'iguez et al. (2020)~\cite{ref12} & SICAPv2 & Patch-based WSI processing & Shallow CNN trained from scratch + global max pooling; MLP on grade percentages & \xmark & \xmark~/\ \xmark & 0.81 / --- \\
 \addlinespace
-Marini et al. (2023)~\cite{ref18} & SICAPv2, PANDA & $750\times 750$ patches at 40$\times$, resized to $224\times 224$ & Data-driven HSC colour augmentation & \cmark & \xmark~/\ \xmark & 0.717 $\pm$ 0.048 / 0.492 $\pm$ 0.061 \\
+Marini et al. (2023)~\cite{ref18} & SICAPv2, PANDA & $750\times 750$ patches at 40$\times$, resized to $224\times 224$ & Data-driven HSC colour augmentation & \cmark & \xmark~/\ \xmark & 0.717 $\pm$ 0.048 / \newline 0.492 $\pm$ 0.061 \\
 \addlinespace
-Schmidt et al. (2024)~\cite{ref19} & SICAPv2, PANDA & 10$\times$ magnification; $512\times 512$ patches; 50\% overlap & Attention Gaussian process (AGP) MIL & \cmark & \xmark~/\ \xmark & 0.847 $\pm$ 0.001$^\dagger$ / 0.920 $\pm$ 0.001 \\
+Schmidt et al. (2024)~\cite{ref19} & SICAPv2, PANDA & 10$\times$ mag.; $512\times 512$ patches; 50\% overlap & Attention Gaussian process (AGP) MIL & \cmark & \xmark~/\ \xmark & 0.847 $\pm$ 0.001$^\dagger$ / \newline 0.920 $\pm$ 0.001 \\
 \addlinespace
-\textbf{GradeFormer (this work)} & SICAPv2 + Gleason2019 (dev); PANDA (test) & Otsu filtering, Macenko normalization, two-view tiling & Multi-scale graph transformer + LRA pooling & \cmark & \cmark~/\ \cmark & \textbf{0.860 / 0.605} \\
+\textbf{GradeFormer (this work)} & SICAPv2 + Gleason2019 (dev); PANDA (test) & Otsu filtering, Macenko norm., two-view tiling & Multi-scale graph transformer + LRA pooling & \cmark & \cmark~/\ \cmark & \textbf{0.860 / 0.605} \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabularx}
 \end{table}
 
 
@@ -151,21 +152,22 @@ Three publicly available prostate histopathology datasets were used: SICAPv2 \ci
 
 \begin{table}[H]
 \centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.25}
 \caption{Datasets used for model development, auxiliary supervision, internal testing, and external evaluation.}
 \label{tab:datasets}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{p{2.4cm} p{4.2cm} p{2.6cm} p{3.0cm} p{3.4cm} p{6.2cm} p{4.0cm}}
+\begin{tabularx}{\textwidth}{p{1.6cm} p{2.2cm} p{2.0cm} p{1.7cm} p{1.8cm} X p{2.1cm}}
 \toprule
-\textbf{Dataset} & \textbf{Role} & \textbf{Unit of analysis} & \textbf{Slides / cores} & \textbf{Patients} & \textbf{Ground-truth source} & \textbf{Patch source} \\
+\textbf{Dataset} & \textbf{Role} & \textbf{\shortstack{Unit of\\analysis}} & \textbf{\shortstack{Slides /\\cores}} & \textbf{Patients} & \textbf{\shortstack{Ground-truth\\source}} & \textbf{\shortstack{Patch\\source}} \\
 \midrule
-SICAPv2~\cite{ref12} & Development (122 biopsies) and held-out internal test (33 biopsies) & Whole-slide biopsy & 155 & 95 & Primary and secondary Gleason pattern per slide (\texttt{wsi\_labels} file) & $512\times 512$ patches from official partition files \\
+SICAPv2~\cite{ref12} & Development (122) and held-out internal test (33) & Whole-slide biopsy & 155 & 95 & Primary and secondary Gleason pattern per slide (\texttt{wsi\_labels} file) & $512\times 512$ patches from official partition files \\
 \addlinespace
-Gleason2019~\cite{ref5} & Auxiliary development data only & Tissue microarray (TMA) core & 244 & Not given per core (full cohort: 333 cores from 231 patients) & STAPLE consensus of pathologist annotations; core grade from percentage rule (Section 3.3) & $512\times 512$ tiles cut from released core images \\
+Gleason2019~\cite{ref5} & Auxiliary development data only & Tissue microarray (TMA) core & 244 & Not given per core (full cohort: 333 cores, 231 patients) & STAPLE consensus of pathologist annotations; core grade from percentage rule (Section 3.3) & $512\times 512$ tiles cut from released core images \\
 \addlinespace
 PANDA~\cite{ref6} & External test only & Whole-slide biopsy & 300 (149 Karolinska, 151 Radboud) & Not reported & ISUP grade provided with PANDA training metadata & $512\times 512$ tiles at pyramid level 0 \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabularx}
 \end{table}
 
 
@@ -548,16 +550,14 @@ GradeFormer was compared with the patch-percentage baseline (V1) using a paired 
 \renewcommand{\arraystretch}{1.15}
 \caption{Paired bootstrap comparison of GradeFormer and the patch-percentage baseline using 4,000 resamples and default-rounding predictions.}
 \label{tab:bootstrap_significance}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccc}
+\begin{tabularx}{\textwidth}{p{2.8cm}CCCCC}
 \toprule
 \textbf{Evaluation cohort} & \textbf{Sample size ($n$)} & \textbf{QWK (GradeFormer)} & \textbf{QWK (baseline)} & \textbf{$\Delta$QWK (point / bootstrap mean)} & \textbf{One-sided bootstrap $p$} \\
 \midrule
 SICAPv2 held-out & 33 & 0.946 & 0.642 & +0.304 / +0.309 & $< 0.001$ \\
 PANDA external & 300 & 0.605 & 0.346 & +0.259 / +0.260 & $< 0.001$ \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabularx}
 \end{table}
 
 Table 9 summarizes parameter counts and inference latency for the slide-level components on a single T4 GPU. Latency was estimated from ten forward passes using batches of four held-out SICAPv2 graphs (approximately 131 nodes per graph), following two warm-up passes; elapsed time was divided by the number of graphs. The measurement excludes UNI feature extraction because the foundation-model embeddings were generated once offline and cached, as is common in feature-based MIL pipelines. Feature extraction remains part of the end-to-end workflow and was not timed here. Larger graphs, including PANDA graphs with an average of approximately 399 nodes, are expected to require more computation.
