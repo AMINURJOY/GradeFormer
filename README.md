@@ -122,14 +122,6 @@ pip install -r requirements.txt
 
 ---
 
-## Citation
-
-```bibtex
-@article{gradeformer2025,
-  title={GradeFormer: A Multi-Scale Slide-Graph Transformer with Low-Rank Attention Pooling for Cross-Institutional ISUP Grading of Prostate Biopsies},
-  author={Rahman, Md. Hafizur and Joy, Md. Aminur Rahman and Islam, Md. Moinul and Haque, Aminul and Song, Hanjung},
-  year={2025}
-}
 ```
 
 ---
