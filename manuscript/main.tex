@@ -109,21 +109,23 @@ Table 1 places these studies alongside GradeFormer. The earlier pipelines summar
 
 \begin{table}[H]
 \centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.2}
 \caption{Overview of prostate histopathology grading methods, datasets, preprocessing, and evaluation settings. ``Ext. Val.'' indicates evaluation on a cohort not used for training; ``MS / Graph'' indicates multi-scale representation and spatial graph modeling.}
 \label{tab:related_methods}
-\begin{tabularx}{\textwidth}{p{2.6cm}p{1.8cm}p{2.6cm}Xccc}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{p{3.8cm} p{2.8cm} p{3.8cm} p{6.2cm} c c c}
 \toprule
 \textbf{Reference} & \textbf{Dataset} & \textbf{Preprocessing} & \textbf{Method} & \textbf{Ext. Val.} & \textbf{MS / Graph} & \textbf{QWK / $\kappa$ (int. / ext.)} \\
 \midrule
 Silva-Rodr\'iguez et al. (2020)~\cite{ref12} & SICAPv2 & Patch-based WSI processing & Shallow CNN trained from scratch + global max pooling; MLP on grade percentages & \xmark & \xmark~/\ \xmark & 0.81 / --- \\
+\addlinespace
 Marini et al. (2023)~\cite{ref18} & SICAPv2, PANDA & $750\times 750$ patches at 40$\times$, resized to $224\times 224$ & Data-driven HSC colour augmentation & \cmark & \xmark~/\ \xmark & 0.717 $\pm$ 0.048 / 0.492 $\pm$ 0.061 \\
+\addlinespace
 Schmidt et al. (2024)~\cite{ref19} & SICAPv2, PANDA & 10$\times$ magnification; $512\times 512$ patches; 50\% overlap & Attention Gaussian process (AGP) MIL & \cmark & \xmark~/\ \xmark & 0.847 $\pm$ 0.001$^\dagger$ / 0.920 $\pm$ 0.001 \\
+\addlinespace
 \textbf{GradeFormer (this work)} & SICAPv2 + Gleason2019 (dev); PANDA (test) & Otsu filtering, Macenko normalization, two-view tiling & Multi-scale graph transformer + LRA pooling & \cmark & \cmark~/\ \cmark & \textbf{0.860 / 0.605} \\
 \bottomrule
-\end{tabularx}
+\end{tabular}%
+}
 \end{table}
 
 
@@ -149,25 +151,26 @@ Three publicly available prostate histopathology datasets were used: SICAPv2 \ci
 
 \begin{table}[H]
 \centering
-\footnotesize
-\setlength{\tabcolsep}{3.5pt}
-\renewcommand{\arraystretch}{1.2}
 \caption{Datasets used for model development, auxiliary supervision, internal testing, and external evaluation.}
 \label{tab:datasets}
-\begin{tabularx}{\textwidth}{p{2.0cm}p{2.8cm}p{1.8cm}p{1.8cm}p{2.2cm}Xp{2.5cm}}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{p{2.4cm} p{4.2cm} p{2.6cm} p{3.0cm} p{3.4cm} p{6.2cm} p{4.0cm}}
 \toprule
 \textbf{Dataset} & \textbf{Role} & \textbf{Unit of analysis} & \textbf{Slides / cores} & \textbf{Patients} & \textbf{Ground-truth source} & \textbf{Patch source} \\
 \midrule
-SICAPv2~\cite{ref12} & Development (122 biopsies) and held-out internal test (33 biopsies) & Whole-slide biopsy & 155 & 95 & Primary and secondary Gleason pattern per slide (wsi\_labels file) & $512\times 512$ patches from official partition files \\
+SICAPv2~\cite{ref12} & Development (122 biopsies) and held-out internal test (33 biopsies) & Whole-slide biopsy & 155 & 95 & Primary and secondary Gleason pattern per slide (\texttt{wsi\_labels} file) & $512\times 512$ patches from official partition files \\
+\addlinespace
 Gleason2019~\cite{ref5} & Auxiliary development data only & Tissue microarray (TMA) core & 244 & Not given per core (full cohort: 333 cores from 231 patients) & STAPLE consensus of pathologist annotations; core grade from percentage rule (Section 3.3) & $512\times 512$ tiles cut from released core images \\
+\addlinespace
 PANDA~\cite{ref6} & External test only & Whole-slide biopsy & 300 (149 Karolinska, 151 Radboud) & Not reported & ISUP grade provided with PANDA training metadata & $512\times 512$ tiles at pyramid level 0 \\
 \bottomrule
-\end{tabularx}
+\end{tabular}%
+}
 \end{table}
 
 
 \subsection{Primary Development and Internal Validation: SICAPv2}
-SICAPv2 \cite{ref12} contains 155 prostate biopsy WSIs from 95 patients treated at Hospital Clínico Universitario de Valencia, Spain. The release includes patch-level Gleason pattern labels (non-cancerous, GP3, GP4, and GP5) and slide-level primary and secondary Gleason patterns. We used the 12,081 patches of 512$\times$512 pixels supplied in the official partition files and obtained slide-level pattern information from the accompanying wsi_labels file. For each biopsy, the ISUP grade group g $\in$ {0, 1, 2, 3, 4, 5} was derived from its reported primary (p) and secondary (s) Gleason patterns according to Equation (1):
+SICAPv2 \cite{ref12} contains 155 prostate biopsy WSIs from 95 patients treated at Hospital Clínico Universitario de Valencia, Spain. The release includes patch-level Gleason pattern labels (non-cancerous, GP3, GP4, and GP5) and slide-level primary and secondary Gleason patterns. We used the 12,081 patches of 512$\times$512 pixels supplied in the official partition files and obtained slide-level pattern information from the accompanying \texttt{wsi\_labels} file. For each biopsy, the ISUP grade group g $\in$ {0, 1, 2, 3, 4, 5} was derived from its reported primary (p) and secondary (s) Gleason patterns according to Equation (1):
 
 
 \begin{equation}
@@ -223,7 +226,7 @@ The coarse view, X⁽¹⁰ˣ⁾, comprises the complete patch resized to the enc
 
 
 \subsection{External Evaluation: PANDA}
-Cross-institutional performance was assessed on 300 biopsies from the PANDA challenge \cite{ref6}. These were the first 300 entries in the public PANDA training metadata file, ordered by anonymized hexadecimal image identifier; selection was neither randomized nor class-balanced. The subset comprised 149 slides from Karolinska Institutet (Stockholm, Sweden) and 151 from Radboud University Medical Center (Nijmegen, the Netherlands). Reference grades were taken from the isup_grade field in the PANDA training metadata. These are the public training labels and should not be conflated with the expert-panel reference standards used for the challenge's blinded validation cohorts \cite{ref6}. Each WSI was tiled at pyramid level 0 into non-overlapping 512$\times$512 regions. Tiles were filtered and normalized as described above, and up to 384 tissue-containing tiles per slide were retained in raster order. No PANDA images, tiles, or features were used for model training, model selection, hyperparameter search, or OOF cut-point fitting. The grade distributions of the development, held-out, and external cohorts are reported in Table 3.
+Cross-institutional performance was assessed on 300 biopsies from the PANDA challenge \cite{ref6}. These were the first 300 entries in the public PANDA training metadata file, ordered by anonymized hexadecimal image identifier; selection was neither randomized nor class-balanced. The subset comprised 149 slides from Karolinska Institutet (Stockholm, Sweden) and 151 from Radboud University Medical Center (Nijmegen, the Netherlands). Reference grades were taken from the \texttt{isup\_grade} field in the PANDA training metadata. These are the public training labels and should not be conflated with the expert-panel reference standards used for the challenge's blinded validation cohorts \cite{ref6}. Each WSI was tiled at pyramid level 0 into non-overlapping 512$\times$512 regions. Tiles were filtered and normalized as described above, and up to 384 tissue-containing tiles per slide were retained in raster order. No PANDA images, tiles, or features were used for model training, model selection, hyperparameter search, or OOF cut-point fitting. The grade distributions of the development, held-out, and external cohorts are reported in Table 3.
 
 
 \begin{table}[H]
@@ -545,14 +548,16 @@ GradeFormer was compared with the patch-percentage baseline (V1) using a paired 
 \renewcommand{\arraystretch}{1.15}
 \caption{Paired bootstrap comparison of GradeFormer and the patch-percentage baseline using 4,000 resamples and default-rounding predictions.}
 \label{tab:bootstrap_significance}
-\begin{tabularx}{\textwidth}{lCCCCC}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
 \toprule
 \textbf{Evaluation cohort} & \textbf{Sample size ($n$)} & \textbf{QWK (GradeFormer)} & \textbf{QWK (baseline)} & \textbf{$\Delta$QWK (point / bootstrap mean)} & \textbf{One-sided bootstrap $p$} \\
 \midrule
 SICAPv2 held-out & 33 & 0.946 & 0.642 & +0.304 / +0.309 & $< 0.001$ \\
 PANDA external & 300 & 0.605 & 0.346 & +0.259 / +0.260 & $< 0.001$ \\
 \bottomrule
-\end{tabularx}
+\end{tabular}%
+}
 \end{table}
 
 Table 9 summarizes parameter counts and inference latency for the slide-level components on a single T4 GPU. Latency was estimated from ten forward passes using batches of four held-out SICAPv2 graphs (approximately 131 nodes per graph), following two warm-up passes; elapsed time was divided by the number of graphs. The measurement excludes UNI feature extraction because the foundation-model embeddings were generated once offline and cached, as is common in feature-based MIL pipelines. Feature extraction remains part of the end-to-end workflow and was not timed here. Larger graphs, including PANDA graphs with an average of approximately 399 nodes, are expected to require more computation.
@@ -704,7 +709,7 @@ GradeFormer combines frozen UNI features from two relative patch scales, a spati
 
 \textbf{Data availability:} All datasets analyzed in this study are publicly available. SICAPv2 is described in \cite{ref12} and distributed through Mendeley Data; Gleason2019 is available through the Grand Challenge platform \cite{ref5}; and PANDA is available through Kaggle \cite{ref6}.
 
-\textbf{Code availability:} Source code, precomputed graph structures, and trained model weights will be made available in a public GitHub repository upon publication.
+\textbf{Code availability:} Source code, precomputed graph structures, and trained model weights are publicly available at \url{https://github.com/AMINURJOY/GradeFormer}.
 
 \textbf{Use of generative AI:} During manuscript preparation, the authors used Claude (Anthropic) and ChatGPT (OpenAI) for language editing and editorial refinement. The authors reviewed and revised the resulting text and accept responsibility for all statements and for the final manuscript.
 
